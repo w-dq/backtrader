@@ -61,5 +61,4 @@ def parse_args(pargs=None):
 if __name__ == "__main__":
     args = parse_args()
     prep_offline_data(args.symbol,args.start,args.end,args.freq,args.filename)
-    print(args.long_period)
     run(args.filename,args.l_period,args.s_period)
