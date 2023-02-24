@@ -1,6 +1,7 @@
 # Backtrader
 
 Feel free to choose your own symbol freqency and period
+
 Be aware that not all freqencies and periods have data
 
 ```text
