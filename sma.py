@@ -31,7 +31,7 @@ def parse_args(pargs=None):
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description='sigsmacross')
+        description='Simple Moving Average Stratergy')
 
     parser.add_argument('--symbol',required=False, default='BTC',
                         help='Yahoo symbol')
@@ -48,11 +48,11 @@ def parse_args(pargs=None):
     parser.add_argument('--filename', required=False, default='data.csv',
                         help=('name of the file that data is stored in'))
     
-    parser.add_argument('--long_period', required=False, default=30, type=int,
-                        help=('Arguments for the strategy'))
+    parser.add_argument('--l_period', required=False, default=30, type=int,
+                        help=('Long period for MA'))
 
-    parser.add_argument('--short_period', required=False, default=10, type=int,
-                        help=('Arguments for the strategy'))           
+    parser.add_argument('--s_period', required=False, default=10, type=int,
+                        help=('short period for MA'))           
 
     return parser.parse_args(pargs)
 
@@ -62,4 +62,4 @@ if __name__ == "__main__":
     args = parse_args()
     prep_offline_data(args.symbol,args.start,args.end,args.freq,args.filename)
     print(args.long_period)
-    run(args.filename,args.long_period,args.short_period)
+    run(args.filename,args.l_period,args.s_period)
