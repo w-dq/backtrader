@@ -1,6 +1,7 @@
 # Backtrader
 
-
+Feel free to choose your own symbol freqency and period
+Be aware that not all freqencies and periods have data
 
 ```text
 usage: sma.py [-h] [--symbol SYMBOL] [--start START] [--end END] [--freq FREQ] [--l_period L_PERIOD] [--s_period S_PERIOD]
