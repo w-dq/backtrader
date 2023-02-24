@@ -5,28 +5,29 @@ import argparse
 import backtrader as bt
 from pandas_datareader import data as pdr
 import yfinance as yf
-yf.pdr_override()
+import yfinance.shared as shared
 
 class SmaCross(bt.SignalStrategy): 
-    params = (('d0', None),('d1', None))
+    params = (('long_p', None),('short_p', None))
     def __init__(self):
-        print(self.params.d1,self.params.d0)
-        sma1, sma2 = bt.ind.SMA(period=self.params.d1), bt.ind.SMA(period=self.params.d0)
+        sma1, sma2 = bt.ind.SMA(period=self.params.short_p), bt.ind.SMA(period=self.params.long_p)
         crossover = bt.ind.CrossOver(sma1, sma2)
         self.signal_add(bt.SIGNAL_LONG, crossover)
 
-def prep_offline_data(symbol, fromdate, todate, freq,filename):
-    data_raw = pdr.get_data_yahoo(symbol, start=fromdate, end=todate, interval=freq)
-    data_raw.to_csv(filename)    
+def prep_offline_data(symbol, fromdate, todate, freq):
+    data =  bt.feeds.PandasData(dataname=yf.download(symbol, fromdate, todate, interval = freq))
+    fails = list(shared._ERRORS.keys())
+    if fails:
+        raise RuntimeError("\n [Custom Error Msg] Fail to download %s symbol" % ("|".join(fails)))
+    return data
 
-def run(filename,long_p,short_p):
+def run(data_feed,long_p,short_p):
     cerebro = bt.Cerebro()
-    cerebro.addstrategy(SmaCross,d0=long_p,d1=short_p)
-    data_feed = bt.feeds.YahooFinanceCSVData(dataname=filename)
+    cerebro.addstrategy(SmaCross,long_p=long_p,short_p=short_p)
     cerebro.adddata(data_feed)
     cerebro.run()
     cerebro.plot()
-
+    
 def parse_args(pargs=None):
 
     parser = argparse.ArgumentParser(
@@ -44,9 +45,6 @@ def parse_args(pargs=None):
 
     parser.add_argument('--freq', required=False, default='1d',
                         help=('[1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]'))
-
-    parser.add_argument('--filename', required=False, default='data.csv',
-                        help=('name of the file that data is stored in'))
     
     parser.add_argument('--l_period', required=False, default=30, type=int,
                         help=('Long period for MA'))
@@ -60,5 +58,5 @@ def parse_args(pargs=None):
 
 if __name__ == "__main__":
     args = parse_args()
-    prep_offline_data(args.symbol,args.start,args.end,args.freq,args.filename)
-    run(args.filename,args.l_period,args.s_period)
+    data_feed = prep_offline_data(args.symbol, args.start, args.end, args.freq)
+    run(data_feed, args.l_period, args.s_period)
