@@ -1,6 +1,6 @@
 import backtrader as bt
 
-class Nothing(bt.SignalStrategy):
+class Template(bt.SignalStrategy):
     def __init__(self):
         pass
 

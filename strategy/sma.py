@@ -16,7 +16,7 @@ class SmaCross(bt.SignalStrategy):
     
         if not self.position:  
             if self.crossover > 0:             
-                self.order = self.buy(size=100)
+                self.order = self.buy()
         elif self.crossover < 0:            
             self.order = self.close()
 

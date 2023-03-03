@@ -1,10 +1,10 @@
 {
     "data_args":{
-        "symbol": "BTC",
+        "symbol": "AAPL",
         "fromdate": "2020-01-01",
         "todate": "2023-02-22",
         "freq": "1d",
-        "read_from_csv": "data.csv"
+        "read_from_csv": null
     },
     "strategy_args":{
         "strategy_path": "strategy.sma",
@@ -14,7 +14,13 @@
             "s_period": 10
         }
     },
+    "commission_args":{
+        "commission": 0.01,
+        "margin": null,
+        "mult": 1.0
+    },
     "broker_args":{
-        "pass":0
+        "cash":1000000,
+        "slippage": 0
     }
 }
