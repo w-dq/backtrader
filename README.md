@@ -6,6 +6,19 @@ An application to run backtesting using Backtrader
 
 ## Environment and Installation
 
+```
+conda create --name bt python=3.8
+conda activate bt
+
+conda install pandas 
+pip install backtrader
+pip install yfinance
+
+pip install matplotlib==3.2.2
+pip install seaborn
+
+```
+
 
 
 ## Config Files

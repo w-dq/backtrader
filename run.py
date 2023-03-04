@@ -9,6 +9,11 @@ import backtrader as bt
 
 from broker import MyBroker
 
+import matplotlib.pyplot as plt
+
+# Analyzers
+# SharpeRatio: SQN: DrawDown: TimeReturn: VWR: TradeAnalyzer: PyFolio: AnnualReturn: Calmar: Omega: Sortino: TailRisk: 
+
 def prep_data_feed(symbol, fromdate, todate, freq, read_from_csv):
     if read_from_csv: 
         df = pd.read_csv(read_from_csv, index_col='Date', parse_dates=True)
@@ -31,8 +36,13 @@ def run(data_feed,strategy_class,broker_info,commission_info,strategy_args):
     cerebro.setbroker(my_broker)
 
     cerebro.broker.setcommission(commission = commission_info.commission, margin = commission_info.margin,mult = commission_info.mult)
-    cerebro.run()
-    cerebro.plot()
+
+    # analyzer = bt.analyzers.SharpeRatio
+    # cerebro.addanalyzer(analyzer)
+
+    results = cerebro.run()
+
+    return results
 
 def load_config():
     strategy_args = types.SimpleNamespace()
@@ -54,4 +64,5 @@ if __name__ == "__main__":
 
     module = importlib.import_module(strategy_config.strategy_path)
     Strategy = getattr(module, strategy_config.strategy_class)
-    run(data_feed, Strategy, broker_config, commission_config, strategy_config.parameters)
+    pnl = run(data_feed, Strategy, broker_config, commission_config, strategy_config.parameters)
+    print(pnl)

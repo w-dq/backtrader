@@ -1,7 +1,7 @@
 {
     "data_args":{
         "symbol": "AAPL",
-        "fromdate": "2020-01-01",
+        "fromdate": "2020-04-21",
         "todate": "2023-02-22",
         "freq": "1d",
         "read_from_csv": null
