@@ -1,18 +1,20 @@
 import importlib
 import json
 import types
+import csv
 
 import pandas as pd
 import yfinance as yf
 import yfinance.shared as shared
 import backtrader as bt
+import matplotlib.pyplot as plt
 
 from broker import MyBroker
-
-import matplotlib.pyplot as plt
+from analyzer.totalvalue import TotalValue
 
 # Analyzers
 # SharpeRatio: SQN: DrawDown: TimeReturn: VWR: TradeAnalyzer: PyFolio: AnnualReturn: Calmar: Omega: Sortino: TailRisk: 
+# intervals for yf :[1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
 
 def prep_data_feed(symbol, fromdate, todate, freq, read_from_csv):
     if read_from_csv: 
@@ -37,11 +39,17 @@ def run(data_feed,strategy_class,broker_info,commission_info,strategy_args):
 
     cerebro.broker.setcommission(commission = commission_info.commission, margin = commission_info.margin,mult = commission_info.mult)
 
-    # analyzer = bt.analyzers.SharpeRatio
-    # cerebro.addanalyzer(analyzer)
+    cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='mysharpe')
+    cerebro.addanalyzer(bt.analyzers.DrawDown, _name='myDD')
+    cerebro.addanalyzer(bt.analyzers.SQN, _name='mySQN')
+    cerebro.addanalyzer(bt.analyzers.VWR, _name='myVWR')
+    cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='myAR')
+    cerebro.addanalyzer(TotalValue, _name='myTV')
 
     results = cerebro.run()
 
+    cerebro.plot()
+    
     return results
 
 def load_config():
@@ -64,5 +72,16 @@ if __name__ == "__main__":
 
     module = importlib.import_module(strategy_config.strategy_path)
     Strategy = getattr(module, strategy_config.strategy_class)
-    pnl = run(data_feed, Strategy, broker_config, commission_config, strategy_config.parameters)
-    print(pnl)
+    results = run(data_feed, Strategy, broker_config, commission_config, strategy_config.parameters)
+    print('Sharpe Ratio :', results[0].analyzers.mysharpe.get_analysis())
+    print('Draw Down    :', results[0].analyzers.myDD.get_analysis())
+    print('SQN          :', results[0].analyzers.mySQN.get_analysis())
+    print('VWR          :', results[0].analyzers.myVWR.get_analysis())
+    print('Annual Return:', results[0].analyzers.myAR.get_analysis())
+    od = results[0].analyzers.myTV.get_analysis()
+    headers = list(od.keys())
+    values = [str(val) for val in list(od.values())]
+    with open('output.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for k, v in od.items():
+            writer.writerow([k, v-broker_config["cash"]])

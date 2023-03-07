@@ -15,30 +15,12 @@ class SmaCross(bt.SignalStrategy):
             self.cancel(self.order)  
     
         if not self.position:  
-            if self.crossover > 0:             
-                self.order = self.buy()
+            if self.crossover > 0:  
+                self.order = self.buy(size=10)
         elif self.crossover < 0:            
             self.order = self.close()
 
     def notify_order(self, order):
         pass
-        # if order.status in [order.Submitted, order.Accepted]:
-        #     return
-        # if order.status in [order.Completed, order.Canceled, order.Margin]:
-        #     if order.isbuy():
-        #         self.log(
-        #             'BUY EXECUTED, ref:%.0f，Price: %.4f, Size: %.2f, Cost: %.4f, Comm %.4f' %
-        #             (order.ref,
-        #              order.executed.price,
-        #              order.executed.size,
-        #              order.executed.value,
-        #              order.executed.comm))
-        #     else:
-        #         self.log('SELL EXECUTED, ref:%.0f, Price: %.4f, Size: %.2f, Cost: %.4f, Comm %.4f' %
-        #                 (order.ref,
-        #                 order.executed.price,
-        #                  order.executed.size,
-        #                 order.executed.value,
-        #                 order.executed.comm))
         
 

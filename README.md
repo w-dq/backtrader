@@ -15,8 +15,6 @@ pip install backtrader
 pip install yfinance
 
 pip install matplotlib==3.2.2
-pip install seaborn
-
 ```
 
 

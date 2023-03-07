@@ -9,44 +9,41 @@ class MyBroker(bt.brokers.BackBroker):
         super().__init__()
         self._last_prices = {}  # A dictionary to store the last price for each asset
         self.slippage = self.params.args["slippage"]
-        self.set_cash(self.params.args["cash"])
+        self.init_cash = self.params.args["cash"]
+    
+    def start(self):
+        self.set_cash(self.init_cash)
 
+    def buy(self, owner, data, size, price=None, plimit=None,
+            exectype=None, valid=None, tradeid=0, oco=None,
+            trailamount=None, trailpercent=None,
+            **kwargs):
 
-    def _simulate_slippage(self, order, price):
-        # Calculate the slippage amount
-        if self.slippage > 0:
-            slippage = self.slippage
+        if price is None:
+            price = data.close[0]
 
-            # Adjust the execution price by the slippage amount
-            if order.isbuy():
-                price += slippage
-            else:
-                price -= slippage
+        # Add slippage to the price
+        price += self.slippage * price
 
-        return price
+        # Execute the order
+        return super().buy(owner, data, size, price=price, plimit=plimit,
+            exectype=exectype, valid=valid, tradeid=tradeid, oco=oco,
+            trailamount=trailamount, trailpercent=trailpercent,
+            **kwargs)
 
-    def _get_exec_price(self, data, order):
-        # Get the current price for the asset
-        price = data.close[0]
+    def sell(self, owner, data, size, price=None, plimit=None,
+             exectype=None, valid=None, tradeid=0, oco=None,
+             trailamount=None, trailpercent=None,
+             **kwargs):
 
-        # Simulate slippage by adjusting the execution price
-        price = self._simulate_slippage(order, price)
+        if price is None:
+            price = data.close[0]
 
-        # Store the last price for the asset
-        self._last_prices[data] = price
+        # Subtract slippage from the price
+        price -= self.slippage * price
 
-        return price
-
-    def _get_fill_size(self, data, order):
-        # Use the default fill size logic
-        fill_size = super()._get_fill_size(data, order)
-
-        # Adjust the fill size based on the remaining cash and the current price
-        if order.isbuy():
-            price = self._last_prices[data]
-            remaining_cash = self.get_cash() - fill_size * price
-            fill_size = min(fill_size, remaining_cash // price)
-        else:
-            fill_size = min(fill_size, self.getposition(data).size)
-
-        return fill_size
+        # Execute the order
+        return super().sell(owner, data, size, price=price, plimit=plimit,
+            exectype=exectype, valid=valid, tradeid=tradeid, oco=oco,
+            trailamount=trailamount, trailpercent=trailpercent,
+            **kwargs)

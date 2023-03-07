@@ -1,8 +1,8 @@
 {
     "data_args":{
-        "symbol": "AAPL",
-        "fromdate": "2020-04-21",
-        "todate": "2023-02-22",
+        "symbol": "BTC-USD",
+        "fromdate": "2020-03-01",
+        "todate": "2023-03-01",
         "freq": "1d",
         "read_from_csv": null
     },
@@ -19,7 +19,8 @@
         "margin": null,
         "mult": 1.0
     },
-    "broker_args":{
+    "broker_args":
+    {
         "cash":1000000,
         "slippage": 0
     }
