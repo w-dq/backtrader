@@ -2,16 +2,15 @@
     "data_args":{
         "symbol": "BTC-USD",
         "fromdate": "2020-03-01",
-        "todate": "2023-03-01",
+        "todate": "2023-03-20",
         "freq": "1d",
         "read_from_csv": null
     },
     "strategy_args":{
-        "strategy_path": "strategy.sma",
-        "strategy_class": "SmaCross",
+        "strategy_path": "strategy.rbreaker",
+        "strategy_class": "RBreaker",
         "parameters":{
-            "l_period": 30,
-            "s_period": 10
+            "period": 1
         }
     },
     "commission_args":{
@@ -21,7 +20,7 @@
     },
     "broker_args":
     {
-        "cash":1000000,
+        "cash":200000,
         "slippage": 0
     }
 }

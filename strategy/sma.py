@@ -1,5 +1,14 @@
 import backtrader as bt
 
+    # "strategy_args":{
+    #     "strategy_path": "strategy.sma",
+    #     "strategy_class": "SmaCross",
+    #     "parameters":{
+    #         "l_period": 30,
+    #         "s_period": 10
+    #     }
+    # },
+    
 class SmaCross(bt.SignalStrategy): 
     params = (('args', None),)
     def __init__(self):

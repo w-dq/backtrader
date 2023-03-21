@@ -2,12 +2,14 @@ import importlib
 import json
 import types
 import csv
-
+import numpy as np
 import pandas as pd
 import yfinance as yf
 import yfinance.shared as shared
 import backtrader as bt
 import matplotlib.pyplot as plt
+
+# import seaborn as sns
 
 from broker import MyBroker
 from analyzer.totalvalue import TotalValue
@@ -49,7 +51,7 @@ def run(data_feed,strategy_class,broker_info,commission_info,strategy_args):
     results = cerebro.run()
 
     cerebro.plot()
-    
+
     return results
 
 def load_config():
@@ -73,15 +75,55 @@ if __name__ == "__main__":
     module = importlib.import_module(strategy_config.strategy_path)
     Strategy = getattr(module, strategy_config.strategy_class)
     results = run(data_feed, Strategy, broker_config, commission_config, strategy_config.parameters)
+    
     print('Sharpe Ratio :', results[0].analyzers.mysharpe.get_analysis())
     print('Draw Down    :', results[0].analyzers.myDD.get_analysis())
     print('SQN          :', results[0].analyzers.mySQN.get_analysis())
     print('VWR          :', results[0].analyzers.myVWR.get_analysis())
     print('Annual Return:', results[0].analyzers.myAR.get_analysis())
+
     od = results[0].analyzers.myTV.get_analysis()
     headers = list(od.keys())
     values = [str(val) for val in list(od.values())]
     with open('output.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for k, v in od.items():
-            writer.writerow([k, v-broker_config["cash"]])
+            writer.writerow([k, (v-broker_config["cash"])/broker_config["cash"]])
+
+    data = pd.read_csv("output.csv",index_col=0,squeeze=True)
+    data.plot()
+    plt.show()
+    
+
+
+
+
+
+
+    # heat_data = []
+    # axis_label = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+    # for p in [5,10,20,50]:
+    #     heat_data = []
+    #     for k1 in axis_label:
+    #         temp = []
+    #         for k2 in axis_label:
+    #             strategy_config.parameters["period"] = p
+    #             strategy_config.parameters["k1"] = k1
+    #             strategy_config.parameters["k2"] = k2
+    #             results = run(data_feed, Strategy, broker_config, commission_config, strategy_config.parameters)
+    #             aarr = res = results[0].analyzers.myAR.get_analysis()
+    #             res = sum(aarr.values()) / len(aarr)
+    #             temp.append(res)
+    #             print('{} {} AR : {}'.format(k1,k2,res))
+    #         heat_data.append(temp)
+
+    #     data = np.array(heat_data,dtype=float)
+    #     data[data==None] = np.nan
+    #     data = np.ma.masked_invalid(data)
+    #     ax = sns.heatmap(data, xticklabels=axis_label, yticklabels=axis_label, vmin=np.nanmin(data), vmax=np.nanmax(data))
+    #     ax.patch.set(hatch='x', edgecolor='black')
+    #     ax.set_xlabel('K2 (sell_level)')
+    #     ax.set_ylabel('K1 (buy_level)')
+    #     ax.set_title("Period = {}".format(p))
+    #     plt.savefig('p{}.png'.format(p))
+    #     plt.clf()
