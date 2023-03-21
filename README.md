@@ -11,6 +11,7 @@ conda create --name bt python=3.8
 conda activate bt
 
 conda install pandas 
+conda install seaborn
 pip install backtrader
 pip install yfinance
 
